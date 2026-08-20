@@ -19,14 +19,17 @@
  *
  * Usage:
  *
- *   pnpm tsx scripts/local/bump-and-build.ts <version> [--skip-sync] [--skip-bump] [--branch <name>]
+ *   pnpm tsx scripts/local/bump-and-build.ts [<version>] [--skip-sync] [--skip-bump] [--branch <name>] [--interactive]
  *
  * Examples:
  *
+ *   pnpm tsx scripts/local/bump-and-build.ts                 # bump to latest published, then build
+ *   pnpm tsx scripts/local/bump-and-build.ts --interactive   # show menu of published versions
  *   pnpm tsx scripts/local/bump-and-build.ts 0.1.0-rc.8
+ *   pnpm tsx scripts/local/bump-and-build.ts dsh-v0.1.0-rc.8 # accept a tag literal too
  *   pnpm tsx scripts/local/bump-and-build.ts patch
  *   pnpm tsx scripts/local/bump-and-build.ts 0.1.0-rc.8 --branch feature/local-build
- *   pnpm tsx scripts/local/bump-and-build.ts --skip-bump   # sync + clean + build only
+ *   pnpm tsx scripts/local/bump-and-build.ts --skip-bump     # sync + clean + build only
  *
  * Exit codes:
  *

@@ -294,10 +294,10 @@ async function resolveVersion(interactive: boolean): Promise<string> {
     process.stdout.write(`  auto-selected latest published version: ${latest.version} (tag ${latest.tag})\n`)
     return latest.version
   }
-  return normalizeVersion(await promptChoice(
+  return normalizeVersion(await promptChoice<PublishedVersion>(
     'Choose a target version:',
     published,
-    entry => `${entry.version}  (tag ${entry.tag})`,
+    (entry: PublishedVersion) => `${entry.version}  (tag ${entry.tag})`,
   ))
 }
 

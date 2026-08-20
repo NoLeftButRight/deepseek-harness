@@ -238,33 +238,31 @@ function normalizeVersion(raw: string): string {
 }
 
 /**
- * Print a numbered menu and ask the user to pick. Empty input returns the
- * default (first) entry.
- * @param prompt - the question to print.
- * @param choices - entries to choose from, in display order.
- * @param format - render an entry for display.
- * @returns The user's chosen entry.
+ * Print a numbered menu of published dsh versions and ask the user to pick.
+ * Empty input returns the default (first / latest) entry.
+ * @param published - entries to choose from, newest first.
+ * @returns The user's chosen version.
  */
-async function promptChoice<T>(prompt: string, choices: readonly T[], format: (item: T) => string): Promise<T> {
-  if (choices.length === 0) throw new Error('cannot prompt from an empty menu')
+async function promptVersionChoice(published: readonly PublishedVersion[]): Promise<PublishedVersion> {
+  if (published.length === 0) throw new Error('cannot prompt from an empty version list')
 
   const rl: ReadlineInterface = createInterface({ input, output })
   try {
-    process.stdout.write(`${prompt}\n`)
-    choices.forEach((choice, index) => {
+    process.stdout.write('Choose a target version:\n')
+    published.forEach((choice, index) => {
       const marker = index === 0 ? ' (default)' : ''
-      process.stdout.write(`  ${String(index + 1).padStart(2)}. ${format(choice)}${marker}\n`)
+      process.stdout.write(`  ${String(index + 1).padStart(2)}. ${choice.version}  (tag ${choice.tag})${marker}\n`)
     })
     while (true) {
-      const answer = (await rl.question(`Enter a number [1-${String(choices.length)}] (default 1): `)).trim()
+      const answer = (await rl.question(`Enter a number [1-${String(published.length)}] (default 1): `)).trim()
       if (answer === '') {
-        const fallback = choices[0]
-        if (fallback === undefined) throw new Error('prompt menu has no default entry')
+        const fallback = published[0]
+        if (fallback === undefined) throw new Error('version menu has no default entry')
         return fallback
       }
       const parsed = Number(answer)
-      if (Number.isInteger(parsed) && parsed >= 1 && parsed <= choices.length) {
-        const picked = choices[parsed - 1]
+      if (Number.isInteger(parsed) && parsed >= 1 && parsed <= published.length) {
+        const picked = published[parsed - 1]
         if (picked === undefined) throw new Error('parsed index out of range')
         return picked
       }
@@ -294,11 +292,8 @@ async function resolveVersion(interactive: boolean): Promise<string> {
     process.stdout.write(`  auto-selected latest published version: ${latest.version} (tag ${latest.tag})\n`)
     return latest.version
   }
-  return normalizeVersion(await promptChoice<PublishedVersion>(
-    'Choose a target version:',
-    published,
-    (entry: PublishedVersion) => `${entry.version}  (tag ${entry.tag})`,
-  ))
+  const picked = await promptVersionChoice(published)
+  return normalizeVersion(picked.version)
 }
 
 /** Main workflow. */

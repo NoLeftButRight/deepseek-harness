@@ -225,6 +225,7 @@ These limits define when the registry needs special care. They are current packa
 - **PTC mode's SDK language follows the one loaded runtime, and a presentation is per agent rather than per tool** — `mode: ptc`/`both` rejects prompt assembly unless `ctx.codeRuntime.language` has a registered SDK renderer; within one agent no tool can be native-only while another is ptc-only.
 - **PTC mode intermediate values are execution-local and unbounded by bytes** — they cannot be reconstructed from session replay and may exhaust process or worker memory; only the outer `run_code` output has the worker's configurable hard cap.
 - **`run_code` state is fresh per run** — a persistent REPL-style kernel is rejected for the MVP, because cross-call state would be invisible to the log.
+- **`tools.register()` validates `parameters` against the supported JSON Schema subset at registration** — a per-property `required: true` (the first-party `defineTool` source form) reaches `tools.register()` only via `parameterSchemaSpecToJsonSchema`; raw MCP or hand-written registrations that omit the conversion fail at registration, not at the next provider round-trip.
 
 <a id="dev-note"></a>
 ### Dev Note

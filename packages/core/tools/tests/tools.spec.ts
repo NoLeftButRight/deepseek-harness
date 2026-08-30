@@ -1957,14 +1957,26 @@ describe('ToolRuntime', () => {
 
   it('rejects schema projection when a raw registration is not lossless JSON', async () => {
     const ctx = await setup()
-    ctx.tools.register({
+    expect(() => ctx.tools.register({
       ...echoTool,
       name: 'lossy-schema',
       parameters: { type: 'object', default: Number.NaN },
-    })
+    })).toThrow(/lossless JSON/)
+  })
 
-    expect(() => ctx.tools.schemas())
-      .toThrow('tool "lossy-schema" parameters must be lossless JSON before schema projection')
+  it('rejects parameters with per-property required:true (DSH internal format must not leak to providers)', async () => {
+    const ctx = await setup()
+    expect(() => ctx.tools.register({
+      ...echoTool,
+      name: 'bad-params',
+      parameters: {
+        type: 'object',
+        properties: {
+          x: { type: 'string', required: true },
+        },
+        required: ['x'],
+      },
+    })).toThrow(/required is not supported on type "string"/)
   })
 
   it('rejects a non-positive or non-finite registration timeout', async () => {

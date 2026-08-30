@@ -225,6 +225,7 @@ Program-only SDK bindings:
 - **PTC mode 的 SDK 语言由当前加载的运行时决定，且呈现方式按 agent 而非按工具**：`mode: ptc`/`both` 会拒绝组装提示词，除非 `ctx.codeRuntime.language` 有已注册的 SDK 渲染器；同一个 agent 内不能让一个工具仅使用 Native，而另一个仅使用 PTC。
 - **PTC mode 中间值只存在于执行局部，且没有字节上限**：它们无法从会话回放重建，并可能耗尽进程或 worker 内存；只有外层 `run_code` 输出受 worker 可配置的硬上限约束。
 - **每次运行都会获得全新的 `run_code` 状态**：MVP 不采用持久 REPL 风格内核，因为跨调用状态不会出现在日志中。
+- **`tools.register()` 在注册时对 `parameters` 校验支持的 JSON Schema 子集**：每个属性上的 `required: true`（一方的 `defineTool` 源格式）仅经 `parameterSchemaSpecToJsonSchema` 才能进入 `tools.register()`；MCP 或手写注册若跳过该转换，注册即失败，而不会等到下一次向 provider 发起请求时才报错。
 
 <a id="dev-note"></a>
 ### 开发备注
